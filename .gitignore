@@ -1,0 +1,10 @@
+*weights
+*runs
+*logs
+*outputs
+*.pyc
+*test
+*.ipynb_checkpoints
+*__pycache__
+*submission
+*submit.ipynb

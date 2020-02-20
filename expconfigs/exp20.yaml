@@ -1,0 +1,18 @@
+EXP: "exp20"
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 0
+
+OPT:
+  BASE_LR: 1e-5
+  CLR: True
+
+TRAIN:
+  MODEL: "ig_resnext101_32x8d"
+  EPOCHS: 100
+  BATCH_SIZE: 8
+  AUG: True
+  RANDAUG_N: 2
+  RANDAUG_M: 11
+  ACTIVATION: 'relu'

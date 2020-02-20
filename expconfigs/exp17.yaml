@@ -1,0 +1,20 @@
+EXP: "exp17"
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 0
+
+OPT:
+  BASE_LR: 1e-4
+
+TRAIN:
+  MODEL: "efficientnet_b4"
+  EPOCHS: 100
+  BATCH_SIZE: 16
+  AUG: True
+  DROPOUT: 0.4
+  RANDAUG_N: 3
+  RANDAUG_M: 13
+
+MODEL:
+  DROP_CONNECT: 0.2

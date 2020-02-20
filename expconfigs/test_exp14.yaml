@@ -1,0 +1,21 @@
+EXP: "test_exp14"
+
+INFER:
+  TTA: True
+
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 3
+
+TRAIN:
+  MODEL: "efficientnet_b2"
+  DROPOUT: 0.2
+
+VAL:
+  BATCH_SIZE: 64
+
+MODEL:
+  DROP_CONNECT: 0.2
+  WEIGHT: "/home/tungthanhlee/CGIAR/src/weights/best_exp14_efficientnet_b2_fold3.pth"
+  

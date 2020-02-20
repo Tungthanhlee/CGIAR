@@ -1,0 +1,10 @@
+EXP: "exp2"
+
+DATA:
+  IMG_SIZE: 224
+  FOLD: 0
+
+TRAIN:
+  MODEL: "resnet50"
+  EPOCHS: 100
+  BATCH_SIZE: 64

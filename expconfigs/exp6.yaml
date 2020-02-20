@@ -1,0 +1,15 @@
+EXP: "exp6"
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 0
+
+TRAIN:
+  MODEL: "efficientnet_b0"
+  EPOCHS: 100
+  BATCH_SIZE: 16
+  AUG: True
+  DROPOUT: 0.2
+
+MODEL:
+  DROP_CONNECT: 0.2
