@@ -7,7 +7,7 @@ _C.EXP = "newexp" # Experiment name
 _C.DEBUG = False
 
 _C.INFER = CN()
-_C.INFER.TTA = True
+_C.INFER.TTA = False
 
 _C.SYSTEM = CN()
 _C.SYSTEM.SEED = 42
@@ -37,7 +37,6 @@ _C.DATA.FOLD = 0
 
 
 _C.OPT = CN()
-_C.OPT.OPTIMIZER = "adamw"
 _C.OPT.GD_STEPS = 1 
 _C.OPT.WARMUP_EPOCHS = 2
 _C.OPT.BASE_LR = 1e-3
@@ -46,7 +45,7 @@ _C.OPT.WEIGHT_DECAY_BIAS = 0.0
 _C.OPT.CLR = False 
 
 _C.TRAIN = CN()
-_C.TRAIN.MODEL = "" # Model name
+_C.TRAIN.MODEL = "resnet101" # Model name
 _C.TRAIN.EPOCHS = 20
 _C.TRAIN.BATCH_SIZE = 16
 _C.TRAIN.NUM_CLASSES = 3
@@ -62,9 +61,8 @@ _C.MODEL = CN()
 _C.MODEL.DROP_CONNECT = 0.0
 _C.MODEL.WEIGHT = "" 
 _C.MODEL.SWA = False
-_C.MODEL.SWA_START = 10
-_C.MODEL.SWA_FREQ = 5
-_C.MODEL.SWA_THRESHOLD = 1.0
+_C.MODEL.SWA_CIRCLES = 1
+_C.MODEL.SWA_EVAL_FREQ = 5
 
 
 

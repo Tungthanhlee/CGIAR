@@ -169,16 +169,25 @@ def main(args, cfg):
 
 
     if args.mode == "train" and cfg.MODEL.SWA == False:
-        train_loop(logging.info, cfg, model, \
-                train_loader, valid_loader, train_criterion, valid_criterion,\
-                optimizer, scheduler, start_epoch, best_metric)
+        time_all = time.time()
+        for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
+            train_loop(logging.info, cfg, model, \
+                        train_loader, train_criterion,\
+                        optimizer, scheduler, epoch)
+            
+            valid_model(logging.info, cfg, model, valid_criterion, valid_loader, best_metric, optimizer, epoch, tta=cfg.INFER.TTA)
+        time_all = (time.time() - time_all)/60.
+        print(f"Finished training in: {round(time_all, 4)} mins")
     elif args.mode == "train" and cfg.MODEL.SWA == True:
+        time_all = time.time()
         print('SWA training')
-        swa_train_loop(logging.info, cfg, model, swa_model, \
-                train_loader, valid_loader, train_criterion, valid_criterion,\
-                optimizer, scheduler, start_epoch, best_metric)
+        for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
+            swa_train_loop(logging.info, cfg, model, swa_model, \
+                    train_loader, valid_loader, train_criterion, valid_criterion,\
+                    optimizer, scheduler, epoch, best_metric)
+        print(f"Finished training in: {round(time_all, 4)} mins")
     elif args.mode == "valid":
-        valid_model(logging.info, cfg, model, valid_criterion, valid_loader, tta=cfg.INFER.TTA)
+        valid_model(logging.info, cfg, model, valid_criterion, valid_loader, best_metric, optimizer, epoch, tta=cfg.INFER.TTA)
 
     else:
         test_model(logging.info, cfg, model, test_loader, weight=cfg.MODEL.WEIGHT,tta=cfg.INFER.TTA)

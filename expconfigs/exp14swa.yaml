@@ -2,8 +2,9 @@ EXP: "exp14swa"
 
 DATA:
   IMG_SIZE: 512
-  FOLD: 3
-
+  FOLD: 0
+INFER:
+  TTA: True
 OPT:
   BASE_LR: 1e-4
   CLR: True
@@ -20,3 +21,4 @@ TRAIN:
 MODEL:
   DROP_CONNECT: 0.3
   SWA: True
+
