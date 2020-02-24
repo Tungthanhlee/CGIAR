@@ -8,11 +8,14 @@ models = [
     # "submission/test_exp8_fold2.npy",
     # "submission/test_exp8_fold3.npy",
     # "submission/test_exp8_fold4.npy".
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold0.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold1.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold2.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold3.npy"
-
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold0.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold1.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold2.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold3.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold0.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold1.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold2.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold3.npy"
 ]
 
 output = 0
@@ -21,12 +24,18 @@ for m in models:
     
 
 data = []
+data_with_extension = []
+
 for n,o in zip(names, output):
     o /= np.sum(o)
     # o = np.clip(o, 0.1, 0.9)
     data.append([n.split(".")[0]] + list(o))
+    # data_with_extension.append([n]+list(o))
 df = pd.DataFrame(data=data, columns=["ID", "leaf_rust", "stem_rust", "healthy_wheat"])
+# df_ext = pd.DataFrame(data=data_with_extension, columns=["ID", "leaf_rust", "stem_rust", "healthy_wheat"])
+
 df.to_csv("submission/submission.csv", index=False)
+# df_ext.to_csv("submission/submission_ext.csv", index=False)
 
 # leak_df = pd.read_csv("submission/leakgps.csv")
 # norm_df = pd.read_csv("submission/submission.csv")

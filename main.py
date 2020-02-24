@@ -15,6 +15,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, Subset
+import time
 
 from torch.optim.lr_scheduler import CyclicLR
 from config import get_cfg_defaults
@@ -166,28 +167,27 @@ def main(args, cfg):
                                     iters_per_epoch=len(train_loader),
                                     warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
     
-
+    if cfg.DATA.PSEUDO:
+        print("Training with pseudo label.")
 
     if args.mode == "train" and cfg.MODEL.SWA == False:
-        time_all = time.time()
-        for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
-            train_loop(logging.info, cfg, model, \
-                        train_loader, train_criterion,\
-                        optimizer, scheduler, epoch)
-            
-            valid_model(logging.info, cfg, model, valid_criterion, valid_loader, best_metric, optimizer, epoch, tta=cfg.INFER.TTA)
-        time_all = (time.time() - time_all)/60.
-        print(f"Finished training in: {round(time_all, 4)} mins")
+        train_loop(logging.info, cfg, model, \
+                train_loader, valid_loader, train_criterion, valid_criterion,\
+                optimizer, scheduler, start_epoch, best_metric)
+    
     elif args.mode == "train" and cfg.MODEL.SWA == True:
         time_all = time.time()
         print('SWA training')
         for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
+            time_ep = time.time()
             swa_train_loop(logging.info, cfg, model, swa_model, \
                     train_loader, valid_loader, train_criterion, valid_criterion,\
                     optimizer, scheduler, epoch, best_metric)
+            time_ep = time.time() - time_ep
+            print(f"Time epoch: {round(time_ep,4)} seconds")
         print(f"Finished training in: {round(time_all, 4)} mins")
     elif args.mode == "valid":
-        valid_model(logging.info, cfg, model, valid_criterion, valid_loader, best_metric, optimizer, epoch, tta=cfg.INFER.TTA)
+        valid_model(logging.info, cfg, model, valid_criterion, valid_loader, tta=cfg.INFER.TTA)
 
     else:
         test_model(logging.info, cfg, model, test_loader, weight=cfg.MODEL.WEIGHT,tta=cfg.INFER.TTA)

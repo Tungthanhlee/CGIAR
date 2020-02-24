@@ -37,8 +37,9 @@ def get_model(cfg):
 def test_model(_print, cfg, model, test_loader, weight, tta=False):
     
     model.load_state_dict(torch.load(weight)["state_dict"])
-    # if tta:
-    model = pytta.TTAWrapper(model, pytta.fliplr_image2label)
+    if tta:
+        print("#############TTA###############")
+        model = pytta.TTAWrapper(model, pytta.fliplr_image2label)
 
     
     model.eval()
@@ -66,12 +67,10 @@ def test_model(_print, cfg, model, test_loader, weight, tta=False):
     
 
 
-def valid_model(_print, cfg, model, valid_criterion,valid_loader, best_metric, optimizer, epoch, tta=False):
-    #tensorboard
-    if cfg.DEBUG == False:
-        tb = SummaryWriter(f"runs/{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}")
+def valid_model(_print, cfg, model, valid_criterion,valid_loader, tta=False):
+
     if tta:
-        _print("##############TTA#############")
+        print("#############TTA###############")
         model = pytta.TTAWrapper(model, pytta.fliplr_image2label)
 
     model.eval()
@@ -99,85 +98,107 @@ def valid_model(_print, cfg, model, valid_criterion,valid_loader, best_metric, o
 
     #compute fucking metrics
     lloss = log_loss(targets, preds, eps=1e-7, labels=np.array([0.,1.,2.]))
+    # lloss = np.mean(lloss)
+
+
     _print("Valid logloss: %.3f, CEloss: %.3f" % (lloss, losses.avg))
-    
-    is_best = lloss < best_metric
-    best_metric = min(lloss, best_metric)
-    
-    #tensorboard
-    if cfg.DEBUG == False:
-        tb.add_scalars('Valid',
-                        {'lloss':lloss}, epoch)
-        save_checkpoint({
-            "epoch": epoch + 1,
-            "arch": cfg.EXP,
-            "state_dict": model.state_dict(),
-            "best_metric": best_metric,
-            "optimizer": optimizer.state_dict(),
-        }, is_best, root=cfg.DIRS.WEIGHTS, filename=f"{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}.pth")
 
-        tb.export_scalars_to_json(os.path.join(cfg.DIRS.OUTPUTS, f"{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}_{round(best_metric,4)}.json"))
-        tb.close()
+    return lloss
 
 
 
-def train_loop(_print, cfg, model, train_loader, criterion, optimizer, scheduler, epoch):
-    
+def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_criterion, optimizer, scheduler, start_epoch, best_metric):
+    time_all = time.time()
     if cfg.DEBUG == False:
         #{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}
         tb = SummaryWriter(f"runs/{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}") #for visualization
+    """
+    TRAIN
+    """
+    for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
+        time_ep = time.time()
+        _print(f"Epoch {epoch + 1}")
 
-    _print(f"Epoch {epoch + 1}")
-    
-    losses = AverageMeter()
-    model.train()
-    tbar = tqdm(train_loader)
+        losses = AverageMeter()
+        model.train()
+        tbar = tqdm(train_loader)
 
-    for i, (image, target) in enumerate(tbar):
-        # print(target)          
-        image = image.cuda()
-        target = target.cuda()
-        # mixup/ cutmix
-        if cfg.DATA.MIXUP:
-            image = mixup_data(image, alpha=cfg.DATA.CM_ALPHA)
-        elif cfg.DATA.CUTMIX:
-            image = cutmix_data(image, alpha=cfg.DATA.CM_ALPHA)
-        output = model(image)
-        loss = criterion(output, target)
-            
-        # gradient accumulation
-        loss = loss / cfg.OPT.GD_STEPS
-        
-        if cfg.SYSTEM.FP16:
-            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                scaled_loss.backward()
-        else:
-            loss.backward()
+        for i, (image, target) in enumerate(tbar):
+            # print(target)          
+            image = image.cuda()
+            target = target.cuda()
+            # mixup/ cutmix
+            if cfg.DATA.MIXUP:
+                image = mixup_data(image, alpha=cfg.DATA.CM_ALPHA)
+            elif cfg.DATA.CUTMIX:
+                image = cutmix_data(image, alpha=cfg.DATA.CM_ALPHA)
+            output = model(image)
+            loss = criterion(output, target)
 
-        if (i + 1) % cfg.OPT.GD_STEPS == 0:
-            if cfg.OPT.CLR:
-                scheduler(optimizer, i, epoch)
+            # gradient accumulation
+            loss = loss / cfg.OPT.GD_STEPS
+
+            if cfg.SYSTEM.FP16:
+                with amp.scale_loss(loss, optimizer) as scaled_loss:
+                    scaled_loss.backward()
             else:
-                scheduler(optimizer, i, epoch, None) # Cosine LR Scheduler
-            optimizer.step()
-            optimizer.zero_grad()
-    
-        # record loss
-        losses.update(loss.item() * cfg.OPT.GD_STEPS, image.size(0))
-        tbar.set_description("Train loss: %.3f, learning rate: %.6f" % (losses.avg, optimizer.param_groups[-1]['lr']))
-        
+                loss.backward()
+
+            if (i + 1) % cfg.OPT.GD_STEPS == 0:
+                if cfg.OPT.CLR:
+                    scheduler(optimizer, i, epoch)
+                else:
+                    scheduler(optimizer, i, epoch, None) # Cosine LR Scheduler
+                optimizer.step()
+                optimizer.zero_grad()
+
+            # record loss
+            losses.update(loss.item() * cfg.OPT.GD_STEPS, image.size(0))
+            tbar.set_description("Train loss: %.3f, learning rate: %.6f" % (losses.avg, optimizer.param_groups[-1]['lr']))
+
+            if cfg.DEBUG == False:
+                #tensorboard
+                tb.add_scalars('Loss', {'loss':losses.avg}, epoch)
+                # tb.add_scalars('Train',
+                #             {'top_lloss':top_lloss.avg}, epoch)
+                tb.add_scalars('Lr', {'Lr':optimizer.param_groups[-1]['lr']}, epoch)
+
+
+        _print("Train loss: %.3f, learning rate: %.6f" % (losses.avg, optimizer.param_groups[-1]['lr']))
+
+        """
+        VALID
+        """
+        top_lloss = valid_model(_print, cfg, model, valid_criterion, valid_loader, tta = cfg.INFER.TTA)
+        # is_best = top_lloss > best_metric
+        # best_metric = max(top_lloss, best_metric)
+        is_best = top_lloss < best_metric
+        best_metric = min(top_lloss, best_metric)
+        _print("Current best: %.3f" % best_metric)
+        #time
+        time_ep = time.time() - time_ep
+        _print(f"Time per epoch: {round(time_ep,4)} seconds")
+
+        #tensorboard
         if cfg.DEBUG == False:
-            #tensorboard
-            tb.add_scalars('Loss', {'loss':losses.avg}, epoch)
-            tb.add_scalars('Lr', {'Lr':optimizer.param_groups[-1]['lr']}, epoch)
-            tb.close
-    
-    
-    _print("Train loss: %.3f, learning rate: %.6f" % (losses.avg, optimizer.param_groups[-1]['lr']))
+            tb.add_scalars('Valid',
+                            {'top_lloss':top_lloss}, epoch)
+            save_checkpoint({
+                "epoch": epoch + 1,
+                "arch": cfg.EXP,
+                "state_dict": model.state_dict(),
+                "best_metric": best_metric,
+                "optimizer": optimizer.state_dict(),
+            }, is_best, root=cfg.DIRS.WEIGHTS, filename=f"{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}.pth")
 
+    #time
+    time_all = (time.time() - time_all)/60.
+    _print(f"Time all: {round(time_all,4)} mins")
 
-    
-    
+    if cfg.DEBUG == False:
+        # tb.export_scalars_to_json(os.path.join(cfg.DIRS.OUTPUTS, f"{cfg.EXP}_{cfg.TRAIN.MODEL}_fold{cfg.DATA.FOLD}_{round(best_metric,4)}.json"))
+        tb.close()
+
 
 def swa_train_loop(_print, cfg, model, swa_model, train_loader,valid_loader, criterion, valid_criterion, optimizer, scheduler, epoch, best_metric):
     
@@ -225,9 +246,7 @@ def swa_train_loop(_print, cfg, model, swa_model, train_loader,valid_loader, cri
     #             swa_n += 1
     #         bn_update(train_loader, swa_model)
     #         current_metric = valid_model(_print, cfg, model, valid_criterion, valid_loader, best_metric, optimizer, epoch, tta=cfg.INFER.TTA)
-
-
-
+    
 
 def moving_average(net1, net2, alpha=1):
     for param1, param2 in zip(net1.parameters(), net2.parameters()):

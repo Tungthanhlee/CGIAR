@@ -1,21 +1,18 @@
-EXP: "exp14"
+EXP: "exp21"
 
 DATA:
   IMG_SIZE: 512
   FOLD: 0
 
-
 OPT:
-  BASE_LR: 1e-4
+  BASE_LR: 1e-5
+  CLR: True
 
 TRAIN:
-  MODEL: "efficientnet_b2"
+  MODEL: "tf_efficientnet_b2"
   EPOCHS: 100
   BATCH_SIZE: 16
   AUG: True
-  DROPOUT: 0.2
   RANDAUG_N: 3
   RANDAUG_M: 13
-
-MODEL:
-  DROP_CONNECT: 0.3
+  ACTIVATION: 'mish'

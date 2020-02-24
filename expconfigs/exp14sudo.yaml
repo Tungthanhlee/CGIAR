@@ -1,22 +1,22 @@
-EXP: "exp14b2"
+EXP: "exp14sudo"
 
 DATA:
   IMG_SIZE: 512
-  FOLD: 3
+  FOLD: 0
+  PSEUDO: True
 
-INFER:
-  TTA: True
+
 OPT:
   BASE_LR: 1e-4
 
 TRAIN:
   MODEL: "efficientnet_b2"
-  EPOCHS: 50
+  EPOCHS: 100
   BATCH_SIZE: 16
   AUG: True
   DROPOUT: 0.2
-  RANDAUG_N: 2
-  RANDAUG_M: 27
+  RANDAUG_N: 3
+  RANDAUG_M: 13
 
 MODEL:
   DROP_CONNECT: 0.3

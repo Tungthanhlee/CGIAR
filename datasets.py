@@ -31,9 +31,11 @@ class CGIAR(Dataset):
         self.mode = mode
         self.df = pd.read_csv(csv)  
         
-        self.data_root = os.path.join(cfg.DIRS.DATA, "train") 
-        if self.mode == 'test':
-            self.data_root = os.path.join(cfg.DIRS.DATA, "test") 
+        # self.data_root = os.path.join(cfg.DIRS.DATA, "train") 
+        # if self.mode == 'test':
+        #     self.data_root = os.path.join(cfg.DIRS.DATA, "test") 
+        
+        self.data_root = os.path.join(cfg.DIRS.DATA, "bunch") 
         self.size = (cfg.DATA.IMG_SIZE, cfg.DATA.IMG_SIZE)
         self.resize_crop = torchvision.transforms.Compose([torchvision.transforms.RandomResizedCrop(self.size,
                                                             scale=(0.7, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2)])
@@ -48,7 +50,18 @@ class CGIAR(Dataset):
         Input: Take image path
         Output: Return image as an array
         """
-        image = Image.open(img_path)
+        
+        try:
+            image = Image.open(img_path)
+        except:
+            try:
+                image = Image.open(img_path+'.jpg')
+            except:
+                try:
+                    image = Image.open(img_path+'.JPG')
+                except:
+                    image = Image.open(img_path+'.jfif')
+        # image = Image.open(img_path)
         image = image.convert('RGB')   
         return image
 
@@ -61,7 +74,8 @@ class CGIAR(Dataset):
         if self.mode == "train" and self.cfg.TRAIN.AUG == True:
             image = self.transform(image)
 
-        image = self.resize_crop(image) #resize image
+        # image = self.resize_crop(image) #resize image
+        image = image.resize(self.size)
         
         #convert from PIL image to np array
         image = torch.from_numpy(np.asarray(image)).float() 
@@ -80,22 +94,14 @@ class CGIAR(Dataset):
             label = torch.from_numpy(class_).type(image.type())
             label = torch.tensor(label, dtype=torch.long)
             return image, label
- 
-def get_onehot(label):
-    if label==0:
-        return torch.tensor([1.,0.,0.])
-    elif label==1:
-        return torch.tensor([0.,1.,0.])
-    else:
-        return torch.tensor([0.,0.,1.])
-
-
-
 
 def get_dataset(cfg, mode):
     
     if mode == 'train':
-        csv = os.path.join(cfg.DATA.CSV,f"train_fold{cfg.DATA.FOLD}.csv")
+        if cfg.DATA.PSEUDO == True:
+            csv = os.path.join(cfg.DATA.CSV,f"pseudo.csv")
+        else:
+            csv = os.path.join(cfg.DATA.CSV,f"train_fold{cfg.DATA.FOLD}.csv")
         dts = CGIAR(cfg, csv, mode)
         batch_size = cfg.TRAIN.BATCH_SIZE
         dataloader = DataLoader(dts, batch_size=batch_size, 
@@ -133,6 +139,8 @@ def get_debug_dataset(cfg, mode):
                                 shuffle=False, drop_last=False,
                                 num_workers=cfg.SYSTEM.NUM_WORKERS)
     return dataloader
+
+
 
 if __name__ == "__main__":
     cfg = get_cfg_defaults()
