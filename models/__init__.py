@@ -11,8 +11,8 @@ from pytorch_toolbelt.inference import tta as pytta
 import time
 from .resnet import ResNet
 from .meta_modell import ResNet, EfficientNet, DenseNet
-from .losses import KnowledgeDistillationLoss, LabelSmoothingCrossEntropyLoss
-from .losses import SigmoidFocalLoss, SoftmaxFocalLoss
+# from .losses import KnowledgeDistillationLoss, LabelSmoothingCrossEntropyLoss
+# from .losses import SigmoidFocalLoss, SoftmaxFocalLoss
 from .metrics import logloss,f1score, AverageMeter
 from .utils import save_checkpoint, mixup_data, cutmix_data, accuracy
 from sklearn.metrics import log_loss, f1_score, accuracy_score
@@ -26,7 +26,6 @@ warnings.filterwarnings("ignore")
 def get_model(cfg):
     if 'efficientnet' in cfg.TRAIN.MODEL:
         model = EfficientNet(cfg)
-
     elif 'res' in cfg.TRAIN.MODEL:
         model = ResNet(cfg)
     elif "dense" in cfg.MODEL.NAME:

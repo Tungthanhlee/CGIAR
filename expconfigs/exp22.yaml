@@ -5,14 +5,17 @@ DATA:
   FOLD: 0
 
 OPT:
-  BASE_LR: 1e-5
-
+  BASE_LR: 1e-4
+  CLR: True
 
 TRAIN:
   MODEL: "efficientnet-b7"
   EPOCHS: 100
   BATCH_SIZE: 4
   AUG: True
-  RANDAUG_N: 2
-  RANDAUG_M: 27
+  RANDAUG_N: 3
+  RANDAUG_M: 13
+
+MODEL:
+  LOSS_LS: True
 

@@ -67,6 +67,9 @@ _C.MODEL.WEIGHT = ""
 _C.MODEL.SWA = False
 _C.MODEL.SWA_CIRCLES = 1
 _C.MODEL.SWA_EVAL_FREQ = 5
+_C.MODEL.LOSS_CE = False
+_C.MODEL.LOSS_LS = False
+_C.MODEL.SMOOTHING = 0.1  #ALPHA for label smoothing
 
 
 

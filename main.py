@@ -25,6 +25,7 @@ from lr_scheduler import LR_Scheduler, WarmupCyclicalLR
 from determinism import setup_determinism
 from torchcontrib.optim import SWA
 from efficientnet_pytorch import EfficientNet
+from loss import LabelSmoothingCrossEntropy
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -98,8 +99,15 @@ def main(args, cfg):
     # Define Loss and Optimizer
     # train_criterion = nn.BCEWithLogitsLoss()
     # valid_criterion = nn.BCEWithLogitsLoss()
-    train_criterion = nn.CrossEntropyLoss()
-    valid_criterion = nn.CrossEntropyLoss()
+    try:
+        if cfg.MODEL.LOSS_CE:
+            train_criterion = nn.CrossEntropyLoss()
+            valid_criterion = nn.CrossEntropyLoss()
+        elif cfg.MODEL.LOSS_LS:
+            train_criterion = LabelSmoothingCrossEntropy(smoothing=cfg.MODEL.SMOOTHING)
+            valid_criterion = LabelSmoothingCrossEntropy(smoothing=cfg.MODEL.SMOOTHING)
+    except:
+        print("Select loss in cfg asshole")
 
     # #optimizer
     optimizer = optim.AdamW(params=model.parameters(), 
@@ -112,7 +120,7 @@ def main(args, cfg):
     # CUDA & Mixed Precision
     if cfg.SYSTEM.CUDA:
         if cfg.MODEL.SWA:
-            print("Swa model to cuda")
+            print("Swa model to cuda, bitch")
             swa_model.cuda()
         
         model = model.cuda()

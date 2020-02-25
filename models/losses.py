@@ -77,21 +77,22 @@ class SoftmaxFocalLoss(nn.Module):
         return loss.sum()
 
 
-class LabelSmoothingCrossEntropyLoss(nn.Module):
+class LabelSmoothingCrossEntropy(nn.Module):
     """
-    Negative log-likelihood loss with label smoothing.
-
-    Args:
-        smoothing (float): label smoothing factor (default=0.1).
+    NLL loss with label smoothing.
     """
     def __init__(self, smoothing=0.1):
+        """
+        Constructor for the LabelSmoothing module.
+        :param smoothing: label smoothing factor
+        """
         super(LabelSmoothingCrossEntropy, self).__init__()
         assert smoothing < 1.0
         self.smoothing = smoothing
         self.confidence = 1. - smoothing
 
-    def forward(self, logit, target):
-        logprobs = F.log_softmax(logit, dim=-1)
+    def forward(self, x, target):
+        logprobs = F.log_softmax(x, dim=-1)
         nll_loss = -logprobs.gather(dim=-1, index=target.unsqueeze(1))
         nll_loss = nll_loss.squeeze(1)
         smooth_loss = -logprobs.mean(dim=-1)
