@@ -24,6 +24,7 @@ from datasets import get_dataset, get_debug_dataset
 from lr_scheduler import LR_Scheduler, WarmupCyclicalLR
 from determinism import setup_determinism
 from torchcontrib.optim import SWA
+from efficientnet_pytorch import EfficientNet
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -88,7 +89,8 @@ def main(args, cfg):
     best_metric = 100.
 
     # Create model
-    model = get_model(cfg)
+    # model = get_model(cfg)
+    model = EfficientNet.from_pretrained(cfg.TRAIN.MODEL, num_classes=cfg.TRAIN.NUM_CLASSES)
     if cfg.MODEL.SWA:
         print("Get swa model.")
         swa_model = get_model(cfg)

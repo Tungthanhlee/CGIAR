@@ -1,0 +1,18 @@
+EXP: "exp22"
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 0
+
+OPT:
+  BASE_LR: 1e-5
+
+
+TRAIN:
+  MODEL: "efficientnet-b7"
+  EPOCHS: 100
+  BATCH_SIZE: 4
+  AUG: True
+  RANDAUG_N: 2
+  RANDAUG_M: 27
+

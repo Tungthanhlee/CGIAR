@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import numpy as np 
 import cv2
+from sklearn.metrics import accuracy_score
 
 
 def _initialize_weights(module):
@@ -76,7 +77,16 @@ def cutmix_data(inputs, alpha=1.):
     inputs[:, :, x1:x2, y1:y2] = inputs_s[:, :, x1:x2, y1:y2]
     return inputs
 
-
+def accuracy(target, output):
+    target = target.cpu().numpy()
+    output = output.cpu().numpy()
+    
+    idx = np.argmax(output, axis=-1)
+    output = np.zeros(output.shape)
+    output[np.arange(output.shape[0]), idx] = 1
+    
+    return accuracy_score(target, output)
+    
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 

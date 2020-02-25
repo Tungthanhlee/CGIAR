@@ -39,6 +39,7 @@ class CGIAR(Dataset):
         self.size = (cfg.DATA.IMG_SIZE, cfg.DATA.IMG_SIZE)
         self.resize_crop = torchvision.transforms.Compose([torchvision.transforms.RandomResizedCrop(self.size,
                                                             scale=(0.7, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2)])
+        self.resize = transforms.Resize(self.size)
         if self.mode == "train":
             self.transform = RandAugment(n=cfg.TRAIN.RANDAUG_N, m=cfg.TRAIN.RANDAUG_M)
             
@@ -71,17 +72,18 @@ class CGIAR(Dataset):
         img_path = os.path.join(self.data_root, info["id"])
         image = self._load_img(img_path) #load img
         
+        image = self.resize(image)
         if self.mode == "train" and self.cfg.TRAIN.AUG == True:
             image = self.transform(image)
 
         # image = self.resize_crop(image) #resize image
-        image = image.resize(self.size)
+        # image = image.resize(self.size)
         
         #convert from PIL image to np array
         image = torch.from_numpy(np.asarray(image)).float() 
         image = torch.tensor(image, dtype=torch.float)
         image = image.permute(2,0,1)
-        image = image.div_(255.)
+        # image = image.div_(255.)
                 
 
         if self.mode == "test":
@@ -91,10 +93,18 @@ class CGIAR(Dataset):
             #get class
             class_ = info["label"]
             class_ = np.asarray(class_)
+            onehot = get_1_hot(class_)
             label = torch.from_numpy(class_).type(image.type())
             label = torch.tensor(label, dtype=torch.long)
-            return image, label
+            return image, label, onehot
 
+def get_1_hot(label):
+    if label == 0:
+        return torch.tensor([1,0,0])
+    elif label == 1:
+        return torch.tensor([0,1,0])
+    elif label == 2:
+        return torch.tensor([0,0,1])
 def get_dataset(cfg, mode):
     
     if mode == 'train':

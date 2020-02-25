@@ -14,8 +14,8 @@ from .meta_modell import ResNet, EfficientNet, DenseNet
 from .losses import KnowledgeDistillationLoss, LabelSmoothingCrossEntropyLoss
 from .losses import SigmoidFocalLoss, SoftmaxFocalLoss
 from .metrics import logloss,f1score, AverageMeter
-from .utils import save_checkpoint, mixup_data, cutmix_data
-from sklearn.metrics import log_loss, f1_score
+from .utils import save_checkpoint, mixup_data, cutmix_data, accuracy
+from sklearn.metrics import log_loss, f1_score, accuracy_score
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 from torchcontrib.optim import SWA
@@ -26,6 +26,7 @@ warnings.filterwarnings("ignore")
 def get_model(cfg):
     if 'efficientnet' in cfg.TRAIN.MODEL:
         model = EfficientNet(cfg)
+
     elif 'res' in cfg.TRAIN.MODEL:
         model = ResNet(cfg)
     elif "dense" in cfg.MODEL.NAME:
@@ -77,11 +78,14 @@ def valid_model(_print, cfg, model, valid_criterion,valid_loader, tta=False):
     tbar = tqdm(valid_loader)
     preds = []
     targets = []
+    
     losses = AverageMeter()
+    top1 = AverageMeter()
     with torch.no_grad():
-        for i, (image, target) in enumerate(tbar):
+        for i, (image, target, onehot) in enumerate(tbar):
             image = image.cuda()
             target = target.cuda()
+            onehot = onehot.cuda()
 
             output = model(image)
             loss = valid_criterion(output, target)
@@ -90,7 +94,12 @@ def valid_model(_print, cfg, model, valid_criterion,valid_loader, tta=False):
             pred = torch.softmax(output, dim=1)
             preds.append(pred.cpu())
             targets.append(target.cpu())
-
+            
+            #Accuracy
+            acc = accuracy(onehot, pred)
+            
+            top1.update(acc, image.size(0))
+            
     #convert this shit to numpy
     preds, targets = torch.cat(preds, 0), torch.cat(targets, 0)
     preds = preds.numpy()
@@ -101,7 +110,7 @@ def valid_model(_print, cfg, model, valid_criterion,valid_loader, tta=False):
     # lloss = np.mean(lloss)
 
 
-    _print("Valid logloss: %.3f, CEloss: %.3f" % (lloss, losses.avg))
+    _print("Valid logloss: %.3f, acc: %.3f, CEloss: %.3f" % (lloss, top1.avg, losses.avg))
 
     return lloss
 
@@ -123,7 +132,7 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
         model.train()
         tbar = tqdm(train_loader)
 
-        for i, (image, target) in enumerate(tbar):
+        for i, (image, target, _) in enumerate(tbar):
             # print(target)          
             image = image.cuda()
             target = target.cuda()
