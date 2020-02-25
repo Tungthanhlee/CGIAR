@@ -23,7 +23,7 @@ from models import train_loop, valid_model, get_model, test_model, swa_train_loo
 from datasets import get_dataset, get_debug_dataset
 from lr_scheduler import LR_Scheduler, WarmupCyclicalLR
 from determinism import setup_determinism
-from torchcontrib.optim import SWA
+# from torchcontrib.optim import SWA
 from efficientnet_pytorch import EfficientNet
 from loss import LabelSmoothingCrossEntropy
 

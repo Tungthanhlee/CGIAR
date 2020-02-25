@@ -18,7 +18,7 @@ from .utils import save_checkpoint, mixup_data, cutmix_data, accuracy
 from sklearn.metrics import log_loss, f1_score, accuracy_score
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
-from torchcontrib.optim import SWA
+# from torchcontrib.optim import SWA
 
 import warnings
 warnings.filterwarnings("ignore")

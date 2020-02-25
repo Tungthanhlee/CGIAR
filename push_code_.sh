@@ -22,9 +22,13 @@ push_code.sh
 
 EOM
 
-USER="dgx2"
+# USER="dgx2"
+USER="dgx1"
 # push code to server
-rsync -vr --exclude-from $TEMP_FILE . $USER:/data/tung/CIGAR/src/
+#dgx2
+# rsync -vr --exclude-from $TEMP_FILE . $USER:/data/tung/CIGAR/src/
+#dgx1
+rsync -vr --exclude-from $TEMP_FILE . $USER:/home/dev/tung/CIGAR/src/
 # pull model weights and log files from server
 # rsync -vr --exclude-from $TEMP_FILE . $USER:/data/datasets/LNDB_segmentation/runs
 # rsync -vr $USER:$REMOTE_HOME/tung_chexpert/Chest-Radiograph-Interpretation-DL/experiments/nasnet_cardiomegaly/ ./experiments/nasnet_cardiomegaly/
