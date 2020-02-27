@@ -1,0 +1,21 @@
+EXP: "exp23"
+
+DATA:
+  IMG_SIZE: 224
+  FOLD: 0
+
+
+OPT:
+  BASE_LR: 1e-3
+  CLR: True
+
+TRAIN:
+  MODEL: "efficientnet-b3"
+  EPOCHS: 100
+  BATCH_SIZE: 64
+  AUG: True
+  RANDAUG_N: 3
+  RANDAUG_M: 13
+
+MODEL:
+  LOSS_LS: True

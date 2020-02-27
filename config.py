@@ -70,6 +70,7 @@ _C.MODEL.SWA_EVAL_FREQ = 5
 _C.MODEL.LOSS_CE = False
 _C.MODEL.LOSS_LS = False
 _C.MODEL.SMOOTHING = 0.1  #ALPHA for label smoothing
+_C.MODEL.RANDOM_LS = False
 
 
 

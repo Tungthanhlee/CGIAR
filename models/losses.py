@@ -77,7 +77,7 @@ class SoftmaxFocalLoss(nn.Module):
         return loss.sum()
 
 
-class LabelSmoothingCrossEntropy(nn.Module):
+class RandomLabelSmoothingLoss(nn.Module):
     """
     NLL loss with label smoothing.
     """
@@ -86,7 +86,7 @@ class LabelSmoothingCrossEntropy(nn.Module):
         Constructor for the LabelSmoothing module.
         :param smoothing: label smoothing factor
         """
-        super(LabelSmoothingCrossEntropy, self).__init__()
+        super(RandomLabelSmoothingLoss, self).__init__()
         assert smoothing < 1.0
         self.smoothing = smoothing
         self.confidence = 1. - smoothing

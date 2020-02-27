@@ -11,8 +11,7 @@ from pytorch_toolbelt.inference import tta as pytta
 import time
 from .resnet import ResNet
 from .meta_modell import ResNet, EfficientNet, DenseNet
-# from .losses import KnowledgeDistillationLoss, LabelSmoothingCrossEntropyLoss
-# from .losses import SigmoidFocalLoss, SoftmaxFocalLoss
+from .losses import RandomLabelSmoothingLoss
 from .metrics import logloss,f1score, AverageMeter
 from .utils import save_checkpoint, mixup_data, cutmix_data, accuracy
 from sklearn.metrics import log_loss, f1_score, accuracy_score
@@ -123,8 +122,14 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
     """
     TRAIN
     """
+    
     for epoch in range(start_epoch, cfg.TRAIN.EPOCHS):
+        
         time_ep = time.time()
+        
+        if cfg.MODEL.RANDOM_LS:
+            train_criterion = RandomLabelSmoothingLoss(smoothing=np.random.uniform(low=0.01, high=0.3))
+            train_criterion = train_criterion.cuda()
         _print(f"Epoch {epoch + 1}")
 
         losses = AverageMeter()
@@ -141,7 +146,11 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
             elif cfg.DATA.CUTMIX:
                 image = cutmix_data(image, alpha=cfg.DATA.CM_ALPHA)
             output = model(image)
-            loss = criterion(output, target)
+            
+            if cfg.MODEL.RANDOM_LS:
+                loss = train_criterion(output, target)
+            else:
+                loss = criterion(output, target)
 
             # gradient accumulation
             loss = loss / cfg.OPT.GD_STEPS

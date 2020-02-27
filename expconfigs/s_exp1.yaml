@@ -1,11 +1,11 @@
 EXP: "server_exp1"
 
 DATA:
-  IMG_SIZE: 224
+  IMG_SIZE: 600
   FOLD: 0
 
 OPT:
-  BASE_LR: 1e-5
+  BASE_LR: 1e-4
   CLR: True
 
 # SYSTEM:
@@ -19,7 +19,7 @@ DATA:
 
 TRAIN:
   MODEL: "efficientnet-b7"
-  EPOCHS: 200
+  EPOCHS: 100
   BATCH_SIZE: 16
   AUG: True
   RANDAUG_N: 3

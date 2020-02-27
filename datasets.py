@@ -72,11 +72,11 @@ class CGIAR(Dataset):
         img_path = os.path.join(self.data_root, info["id"])
         image = self._load_img(img_path) #load img
         
-        image = self.resize(image)
+        # image = self.resize(image)
         if self.mode == "train" and self.cfg.TRAIN.AUG == True:
             image = self.transform(image)
 
-        # image = self.resize_crop(image) #resize image
+        image = self.resize_crop(image) #resize image
         # image = image.resize(self.size)
         
         #convert from PIL image to np array
@@ -91,6 +91,7 @@ class CGIAR(Dataset):
             return image, _id
         else: 
             #get class
+            _id = info["id"]
             class_ = info["label"]
             class_ = np.asarray(class_)
             onehot = get_1_hot(class_)
