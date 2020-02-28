@@ -1,0 +1,23 @@
+EXP: "exp25"
+
+DATA:
+  IMG_SIZE: 512
+  FOLD: 0
+  CUTMIX: True
+
+
+OPT:
+  BASE_LR: 1e-4
+  CLR: True
+
+TRAIN:
+  MODEL: "efficientnet-b2"
+  EPOCHS: 100
+  BATCH_SIZE: 16
+  AUG: True
+  RANDAUG_N: 3
+  RANDAUG_M: 13
+
+MODEL:
+  LOSS_CE: True
+  RANDOM_LS: True

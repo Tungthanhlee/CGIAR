@@ -18,17 +18,21 @@ from sklearn.metrics import log_loss, f1_score, accuracy_score
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 # from torchcontrib.optim import SWA
+from efficientnet_pytorch import EfficientNet as EN
 
 import warnings
 warnings.filterwarnings("ignore")
 
 def get_model(cfg):
-    if 'efficientnet' in cfg.TRAIN.MODEL:
-        model = EfficientNet(cfg)
-    elif 'res' in cfg.TRAIN.MODEL:
-        model = ResNet(cfg)
-    elif "dense" in cfg.MODEL.NAME:
-        model = DenseNet(cfg)
+    try:
+        if 'efficientnet' in cfg.TRAIN.MODEL:
+            model = EfficientNet(cfg)
+        elif 'res' in cfg.TRAIN.MODEL:
+            model = ResNet(cfg)
+        elif "dense" in cfg.MODEL.NAME:
+            model = DenseNet(cfg)
+    except:
+        model = EN.from_pretrained(cfg.TRAIN.MODEL, num_classes=cfg.TRAIN.NUM_CLASSES)
     return model
 
 
@@ -128,7 +132,7 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
         time_ep = time.time()
         
         if cfg.MODEL.RANDOM_LS:
-            train_criterion = RandomLabelSmoothingLoss(smoothing=np.random.uniform(low=0.01, high=0.3))
+            train_criterion = RandomLabelSmoothingLoss(smoothing=np.random.uniform(low=0.05, high=0.15))
             train_criterion = train_criterion.cuda()
         _print(f"Epoch {epoch + 1}")
 
@@ -163,7 +167,10 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
 
             if (i + 1) % cfg.OPT.GD_STEPS == 0:
                 if cfg.OPT.CLR:
-                    scheduler(optimizer, i, epoch)
+                    # scheduler(optimizer, i, epoch)
+                    # scheduler(optimizer)
+                    scheduler.step()
+                    # scheduler.zero_grad()
                 else:
                     scheduler(optimizer, i, epoch, None) # Cosine LR Scheduler
                 optimizer.step()
@@ -178,7 +185,7 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
                 tb.add_scalars('Loss', {'loss':losses.avg}, epoch)
                 # tb.add_scalars('Train',
                 #             {'top_lloss':top_lloss.avg}, epoch)
-                tb.add_scalars('Lr', {'Lr':optimizer.param_groups[-1]['lr']}, epoch)
+                tb.add_scalars('Lr', {'Lr':optimizer.param_groups[-1]['lr']}, i+ epoch*len(train_loader))
 
 
         _print("Train loss: %.3f, learning rate: %.6f" % (losses.avg, optimizer.param_groups[-1]['lr']))

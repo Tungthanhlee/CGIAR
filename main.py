@@ -24,7 +24,7 @@ from datasets import get_dataset, get_debug_dataset
 from lr_scheduler import LR_Scheduler, WarmupCyclicalLR
 from determinism import setup_determinism
 # from torchcontrib.optim import SWA
-from efficientnet_pytorch import EfficientNet
+# from efficientnet_pytorch import EfficientNet
 from loss import LabelSmoothingCrossEntropy
 
 import warnings
@@ -90,8 +90,8 @@ def main(args, cfg):
     best_metric = 100.
 
     # Create model
-    # model = get_model(cfg)
-    model = EfficientNet.from_pretrained(cfg.TRAIN.MODEL, num_classes=cfg.TRAIN.NUM_CLASSES)
+    model = get_model(cfg)
+    # model = EfficientNet.from_pretrained(cfg.TRAIN.MODEL, num_classes=cfg.TRAIN.NUM_CLASSES)
     if cfg.MODEL.SWA:
         print("Get swa model.")
         swa_model = get_model(cfg)
@@ -113,6 +113,8 @@ def main(args, cfg):
     optimizer = optim.AdamW(params=model.parameters(), 
                             lr=cfg.OPT.BASE_LR, 
                             weight_decay=cfg.OPT.WEIGHT_DECAY)
+    if cfg.OPT.CLR:
+        optimizer = optim.SGD(params=model.parameters(), lr=cfg.OPT.BASE_LR, momentum=0.9)
 
 
 
@@ -172,10 +174,12 @@ def main(args, cfg):
                              warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
     
     if cfg.OPT.CLR:
-        print("Use Cyclical learning rate scheduler.")
-        scheduler = WarmupCyclicalLR("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,
-                                    iters_per_epoch=len(train_loader),
-                                    warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
+        print("Use Cyclical learning rate scheduler, bitch.")
+        # scheduler = WarmupCyclicalLR("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,
+        #                             iters_per_epoch=len(train_loader),
+        #                             warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
+        iter_per_ep = np.floor(float(len(train_loader)/cfg.TRAIN.BATCH_SIZE))
+        scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.0001, max_lr=0.0006, step_size_up=2*iter_per_ep)
     
     if cfg.DATA.PSEUDO:
         print("Training with pseudo label.")
