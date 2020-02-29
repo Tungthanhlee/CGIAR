@@ -47,6 +47,8 @@ _C.OPT.BASE_LR = 1e-3
 _C.OPT.WEIGHT_DECAY = 1e-2
 _C.OPT.WEIGHT_DECAY_BIAS = 0.0
 _C.OPT.CLR = False 
+_C.OPT.WARMUP_CLR = False
+_C.OPT.LR_FINDER = False
 
 _C.TRAIN = CN()
 _C.TRAIN.MODEL = "resnet101" # Model name

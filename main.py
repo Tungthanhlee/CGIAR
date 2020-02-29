@@ -26,6 +26,7 @@ from determinism import setup_determinism
 # from torchcontrib.optim import SWA
 # from efficientnet_pytorch import EfficientNet
 from loss import LabelSmoothingCrossEntropy
+from torch_lr_finder import LRFinder
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -169,17 +170,30 @@ def main(args, cfg):
         train_loader = get_debug_dataset(cfg, 'train')
         valid_loader = get_debug_dataset(cfg, 'valid')
 
-    scheduler = LR_Scheduler("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,\
-                             iters_per_epoch=len(train_loader),
-                             warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
+    #lr finder
+    # lr_finder = LRFinder(model, optimizer, train_criterion, device='cuda')
+    # lr_finder.range_test(train_loader, end_lr=10, num_iter=100, step_mode='exp', accumulation_steps=cfg.OPT.GD_STEPS)
+    # lr_finder.plot()
+    # lr_finder.reset()
+    
     
     if cfg.OPT.CLR:
         print("Use Cyclical learning rate scheduler, bitch.")
         # scheduler = WarmupCyclicalLR("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,
         #                             iters_per_epoch=len(train_loader),
         #                             warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
-        iter_per_ep = np.floor(float(len(train_loader)/cfg.TRAIN.BATCH_SIZE))
-        scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.0001, max_lr=0.0006, step_size_up=2*iter_per_ep)
+        iter_per_ep = len(train_loader)
+        scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.03, max_lr=0.1, step_size_up=iter_per_ep // 2)
+    elif cfg.OPT.WARMUP_CLR:
+        print("Use warmup cyclical LR, bitch")
+        scheduler = WarmupCyclicalLR("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,
+                                    iters_per_epoch=len(train_loader),
+                                    warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
+    else:
+        print("Use cosine learning rate scheduler, bitch")
+        scheduler = LR_Scheduler("cos", cfg.OPT.BASE_LR, cfg.TRAIN.EPOCHS,\
+                             iters_per_epoch=len(train_loader),
+                             warmup_epochs=cfg.OPT.WARMUP_EPOCHS)
     
     if cfg.DATA.PSEUDO:
         print("Training with pseudo label.")

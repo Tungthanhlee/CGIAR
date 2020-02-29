@@ -2,13 +2,13 @@ EXP: "exp25"
 
 DATA:
   IMG_SIZE: 512
-  FOLD: 0
+  FOLD: 3
   CUTMIX: True
 
 
 OPT:
   BASE_LR: 1e-4
-  CLR: True
+  WARMUP_CLR: True
 
 TRAIN:
   MODEL: "efficientnet-b2"

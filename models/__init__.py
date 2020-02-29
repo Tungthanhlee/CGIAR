@@ -19,6 +19,7 @@ from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 # from torchcontrib.optim import SWA
 from efficientnet_pytorch import EfficientNet as EN
+from torch_lr_finder import LRFinder
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -164,13 +165,13 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
                     scaled_loss.backward()
             else:
                 loss.backward()
+            
 
             if (i + 1) % cfg.OPT.GD_STEPS == 0:
                 if cfg.OPT.CLR:
-                    # scheduler(optimizer, i, epoch)
-                    # scheduler(optimizer)
                     scheduler.step()
-                    # scheduler.zero_grad()
+                elif cfg.OPT.WARMUP_CLR:
+                    scheduler(optimizer, i, epoch)
                 else:
                     scheduler(optimizer, i, epoch, None) # Cosine LR Scheduler
                 optimizer.step()
@@ -182,7 +183,7 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
 
             if cfg.DEBUG == False:
                 #tensorboard
-                tb.add_scalars('Loss', {'loss':losses.avg}, epoch)
+                tb.add_scalars('Loss', {'loss':losses.avg}, i+ epoch*len(train_loader))
                 # tb.add_scalars('Train',
                 #             {'top_lloss':top_lloss.avg}, epoch)
                 tb.add_scalars('Lr', {'Lr':optimizer.param_groups[-1]['lr']}, i+ epoch*len(train_loader))
