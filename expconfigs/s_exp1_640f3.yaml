@@ -1,26 +1,23 @@
-EXP: "server_exp1"
+EXP: "server_exp1_640"
 
 DATA:
-  IMG_SIZE: 600
-  FOLD: 0
+  IMG_SIZE: 640
+  FOLD: 3
+  CSV: "/home/dev/tung/CIGAR/data/Folds"
 
 OPT:
   BASE_LR: 1e-4
   WARMUP_CLR: True
 
-# SYSTEM:
-  # MULTI_GPU: True
 
 DIRS:
   DATA: "/home/dev/tung/CIGAR/data"
-
-DATA:
-  CSV: "/home/dev/tung/CIGAR/data/Folds"
+  
 
 TRAIN:
   MODEL: "efficientnet-b7"
   EPOCHS: 100
-  BATCH_SIZE: 16
+  BATCH_SIZE: 8
   AUG: True
   RANDAUG_N: 3
   RANDAUG_M: 13

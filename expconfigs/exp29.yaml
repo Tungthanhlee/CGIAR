@@ -1,7 +1,7 @@
-EXP: "exp14"
+EXP: "exp29"
 
 DATA:
-  IMG_SIZE: 512
+  IMG_SIZE: 224
   FOLD: 0
 
 
@@ -9,14 +9,12 @@ OPT:
   BASE_LR: 1e-4
 
 TRAIN:
-  MODEL: "efficientnet_b2"
+  MODEL: "resnet101"
   EPOCHS: 100
-  BATCH_SIZE: 16
+  BATCH_SIZE: 64
   AUG: True
-  DROPOUT: 0.2
   RANDAUG_N: 3
   RANDAUG_M: 13
 
 MODEL:
-  DROP_CONNECT: 0.3
   LOSS_CE: True

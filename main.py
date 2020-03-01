@@ -26,7 +26,7 @@ from determinism import setup_determinism
 # from torchcontrib.optim import SWA
 # from efficientnet_pytorch import EfficientNet
 from loss import LabelSmoothingCrossEntropy
-from torch_lr_finder import LRFinder
+# from torch_lr_finder import LRFinder
 
 import warnings
 warnings.filterwarnings("ignore")

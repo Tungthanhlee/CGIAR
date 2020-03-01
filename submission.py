@@ -8,14 +8,18 @@ models = [
     # "submission/test_exp8_fold2.npy",
     # "submission/test_exp8_fold3.npy",
     # "submission/test_exp8_fold4.npy".
-    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold0.npy",
-    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold1.npy",
-    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold2.npy",
-    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold3.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold0.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold1.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold2.npy",
-    "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold3.npy"
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold0.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold1.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold2.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp14_fold3.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold0.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold1.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold2.npy",
+    # "/home/tungthanhlee/CGIAR/src/submission/test_exp14b2_fold3.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp25_fold0.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp25_fold1.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp25_fold2.npy",
+    "/home/tungthanhlee/CGIAR/src/submission/test_exp25_fold3.npy",
 ]
 
 output = 0

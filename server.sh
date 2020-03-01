@@ -1,2 +1,2 @@
-CUDA_VISIBLE_DEVICES=2,3 python main.py \
-    --config '/home/dev/tung/CIGAR/src/expconfigs/s_exp2.yaml'
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --config '/home/dev/tung/CIGAR/src/expconfigs/s_exp1_rand227.yaml'

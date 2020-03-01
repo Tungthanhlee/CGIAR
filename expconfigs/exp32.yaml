@@ -1,4 +1,4 @@
-EXP: "exp10"
+EXP: "exp32"
 
 DATA:
   IMG_SIZE: 224
@@ -9,13 +9,12 @@ OPT:
   BASE_LR: 1e-4
 
 TRAIN:
-  MODEL: "efficientnet_b0"
-  EPOCHS: 200
+  MODEL: "tv_resnet50"
+  EPOCHS: 100
   BATCH_SIZE: 128
   AUG: True
-  DROPOUT: 0.2
-  RANDAUG_N: 4
+  RANDAUG_N: 3
   RANDAUG_M: 13
 
 MODEL:
-  DROP_CONNECT: 0.2
+  LOSS_CE: True

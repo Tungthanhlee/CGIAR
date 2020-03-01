@@ -6,14 +6,15 @@ INFER:
 
 DATA:
   IMG_SIZE: 512
-  FOLD: 0
+  FOLD: 3
 
 TRAIN:
-  MODEL: "efficientnet_b2"
+  MODEL: "efficientnet-b2"
 
 
 VAL:
   BATCH_SIZE: 64
 
 MODEL:
-  WEIGHT: "/home/tungthanhlee/CGIAR/src/weights/best_exp25_efficientnet-b2_fold0.pth"
+  WEIGHT: "/home/tungthanhlee/CGIAR/src/weights/best_exp25_efficientnet-b2_fold3.pth"
+  LOSS_CE: True

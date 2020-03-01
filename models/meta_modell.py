@@ -1,3 +1,4 @@
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,8 +7,8 @@ import math
 import os
 import torchvision
 import timm
-from timm.models.activations import Swish, Mish
-from timm.models.adaptive_avgmax_pool import SelectAdaptivePool2d
+from timm.models.layers.activations import Swish, Mish
+from timm.models.layers.adaptive_avgmax_pool import SelectAdaptivePool2d
 from config import get_cfg_defaults
 
 def convert_swish_to_mish(model):

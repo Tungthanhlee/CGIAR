@@ -19,14 +19,14 @@ from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 # from torchcontrib.optim import SWA
 from efficientnet_pytorch import EfficientNet as EN
-from torch_lr_finder import LRFinder
+# from torch_lr_finder import LRFinder
 
 import warnings
 warnings.filterwarnings("ignore")
 
 def get_model(cfg):
     try:
-        if 'efficientnet' in cfg.TRAIN.MODEL:
+        if 'tf_efficientnet_b4_ns' in cfg.TRAIN.MODEL:
             model = EfficientNet(cfg)
         elif 'res' in cfg.TRAIN.MODEL:
             model = ResNet(cfg)
@@ -148,7 +148,7 @@ def train_loop(_print, cfg, model, train_loader,valid_loader, criterion, valid_c
             # mixup/ cutmix
             if cfg.DATA.MIXUP:
                 image = mixup_data(image, alpha=cfg.DATA.CM_ALPHA)
-            elif cfg.DATA.CUTMIX:
+            if cfg.DATA.CUTMIX:
                 image = cutmix_data(image, alpha=cfg.DATA.CM_ALPHA)
             output = model(image)
             
