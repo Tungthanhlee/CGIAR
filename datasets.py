@@ -142,19 +142,23 @@ def get_debug_dataset(cfg, mode):
 
 
 
-if __name__ == "__main__":
-    cfg = get_cfg_defaults()
-    # csv = os.path.join(cfg.DATA.CSV,f"train_fold{cfg.DATA.FOLD}.csv")
-    # dts = CGIAR(cfg,csv, mode="train")
-    # print("len: ",dts.__len__())
-    # img, label = dts.__getitem__(500)
-    # print(img.shape, label)
-    # dl = get_dataset(cfg, mode = "train")
-    # print(dl)
-    img = torch.rand((3,224,224))
-    img = getTrainTransforms(222)
-    print(img["image"])
-    
+# if __name__ == "__main__":
+#     cfg = get_cfg_defaults()
+#     # csv = os.path.join(cfg.DATA.CSV,f"train_fold{cfg.DATA.FOLD}.csv")
+#     # dts = CGIAR(cfg,csv, mode="train")
+#     # print("len: ",dts.__len__())
+#     # img, label = dts.__getitem__(500)
+#     # print(img.shape, label)
+#     # dl = get_dataset(cfg, mode = "train")
+#     # print(dl)
+#     img = torch.rand((3,224,224))
+#     img = getTrainTransforms(222)
+#     print(img["image"])
+
+
+
+# cfg = get_cfg_defaults()
+# dl = get_dataset(cfg, mode = "train")
 
     
     

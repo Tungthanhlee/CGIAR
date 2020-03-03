@@ -18,12 +18,12 @@ _C.SYSTEM.MULTI_GPU = False
 _C.SYSTEM.NUM_WORKERS = 8
 
 _C.DIRS = CN()
-_C.DIRS.DATA = "/home/tungthanhlee/CGIAR/data"
+_C.DIRS.DATA = "/home/trung/Desktop/CGIAR/data" #may a trung
 # _C.DIRS.DATA = "/data/tung/CIGAR/data" #on server
 _C.DIRS.WEIGHTS = "./weights/"
 _C.DIRS.OUTPUTS = "./outputs/"
 _C.DIRS.LOGS = "./logs/"
-_C.DIRS.SUB = "/home/tungthanhlee/CGIAR/src/submission/"
+_C.DIRS.SUB = "/home/trung/Desktop/CGIAR/src/submission/" #may a trung
 # _C.DIRS.SUB = "/home/tungthanhlee/CGIAR/src/submission/"  #on server
 
 _C.DATA = CN()
@@ -32,7 +32,7 @@ _C.DATA.CUTMIX = False
 _C.DATA.CM_ALPHA = 1.0
 _C.DATA.INP_CHANNEL = 3
 _C.DATA.IMG_SIZE = 512
-_C.DATA.CSV = "/home/tungthanhlee/CGIAR/data/Folds"
+_C.DATA.CSV = "/home/trung/Desktop/CGIAR/data/Folds"
 # _C.DATA.CSV = "/data/tung/CIGAR/data/Folds" #onsever
 _C.DATA.FOLD = 0
 _C.DATA.PSEUDO = False   #Train with pseudo label
